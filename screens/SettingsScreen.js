@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// const BASE_URL = 'https://y4u5dmmbw7.eu-west-1.awsapprunner.com'; // Base URL
+const BASE_URL = 'http://localhost:8000/';
 
 function SettingsScreen({ navigation }) {
     const [email, setEmail] = useState('');
@@ -13,8 +18,8 @@ function SettingsScreen({ navigation }) {
 
     const fetchSettingsData = async () => {
         try {
-            // Get the email from session storage
-            const storedEmail = sessionStorage.getItem('email');
+            // Get the email from AsyncStorage
+            const storedEmail = await AsyncStorage.getItem('email');
 
             // Check if email is available
             if (!storedEmail) {
@@ -23,7 +28,7 @@ function SettingsScreen({ navigation }) {
             }
 
             // Fetch settings data with the email
-            const response = await axios.post('http://localhost:8000/settings_data', { email: storedEmail });
+            const response = await axios.post(`${BASE_URL}/settings_data`, { email: storedEmail }); // Updated URL
             const data = response.data;
             if (data.error) {
                 setError(data.error);
@@ -38,23 +43,55 @@ function SettingsScreen({ navigation }) {
         }
     };
 
-    const handleLogout = () => {
-        // Clear session storage
-        sessionStorage.removeItem('email');
-        // Redirect to login screen
-        navigation.navigate('SignIn');
+    const handleLogout = async () => {
+        try {
+            // Clear AsyncStorage
+            await AsyncStorage.removeItem('email');
+            // Redirect to login screen
+            navigation.navigate('SignIn');
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
     };
 
     return (
-        <div>
-            <h1>Settings</h1>
-            {error && <p>{error}</p>}
-            <p>Email: {email}</p>
-            <p>Username: {username}</p>
-            <p>AI Name: {aiName}</p>
-            <button onClick={handleLogout}>Logout</button>
-        </div>
+        <View style={styles.container}>
+            <Text style={styles.title}>Settings</Text>
+            {error && <Text style={styles.error}>{error}</Text>}
+            <Text style={styles.text}>Email: {email}</Text>
+            <Text style={styles.text}>Username: {username}</Text>
+            <Text style={styles.text}>AI Name: {aiName}</Text>
+            <Button title="Logout" onPress={handleLogout} style={styles.button} />
+        </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'black',
+        padding: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        color: 'white',
+    },
+    text: {
+        color: 'white',
+        marginBottom: 10,
+    },
+    error: {
+        color: 'red',
+        marginBottom: 10,
+    },
+    button: {
+        marginTop: 20,
+        backgroundColor: '#0000ff',
+    },
+});
 
 export default SettingsScreen;

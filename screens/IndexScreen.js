@@ -1,4 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Text, View, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// const BASE_URL = 'https://y4u5dmmbw7.eu-west-1.awsapprunner.com'; // Base URL
+const BASE_URL = 'http://localhost:8000/';
 
 function ChatComponent() {
     const [userInput, setUserInput] = useState('');
@@ -6,36 +11,35 @@ function ChatComponent() {
     const [resultDestPath, setResultDestPath] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [conversation, setConversation] = useState([]);
-    const [isSending, setIsSending] = useState(false); // State variable to track if a request is pending
+    const [isSending, setIsSending] = useState(false);
     const conversationContainerRef = useRef(null);
 
     useEffect(() => {
-        // Retrieve user's email from session storage upon component mount
-        const email = sessionStorage.getItem('email');
-        if (email) {
-            setUserEmail(email);
-        }
+        AsyncStorage.getItem('email').then(email => {
+            if (email) {
+                setUserEmail(email);
+            }
+        }).catch(error => console.error('Error retrieving email:', error));
     }, []);
 
     useEffect(() => {
-        // Scroll to the bottom of the conversation container whenever conversation updates
-        conversationContainerRef.current.scrollTo(0, conversationContainerRef.current.scrollHeight);
+        if (conversationContainerRef.current) {
+            conversationContainerRef.current.scrollToEnd({ animated: true });
+        }
     }, [conversation]);
 
-    const handleChange = (event) => {
-        setUserInput(event.target.value);
+    const handleChange = (text) => {
+        setUserInput(text);
     };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        
+    const handleSubmit = async () => {
         try {
-            setIsSending(true); // Set isSending to true to indicate a request is being sent
-            const response = await fetch('http://localhost:8000/get_response_react', {
+            setIsSending(true);
+            const response = await fetch(`${BASE_URL}/get_response_react`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'User-Email': userEmail, // Include user's email in the request headers
+                    'User-Email': userEmail,
                 },
                 body: JSON.stringify({ user_input: userInput })
             });
@@ -49,7 +53,6 @@ function ChatComponent() {
                 throw new Error(data.error);
             }
     
-            // Add the user query and AI response to the conversation
             setConversation(prevConversation => [
                 ...prevConversation,
                 { user: userInput, ai: data.response }
@@ -57,45 +60,88 @@ function ChatComponent() {
     
             setResponse(data.response);
             setResultDestPath(data.result_dest_path || '');
-            setUserInput(''); // Clear user input field
+            setUserInput('');
         } catch (error) {
             console.error('Error:', error.message);
         } finally {
-            setIsSending(false); // Set isSending to false when request processing is complete
+            setIsSending(false);
         }
     };
     
 
     return (
-        <div>
-            <h1>Chat with Assistant</h1>
-            <div className="conversation-container" style={{ maxHeight: '300px', overflowY: 'auto' }} ref={conversationContainerRef}>
+        <View style={styles.container}>
+            <Text style={styles.title}>Chat with Assistant</Text>
+            <ScrollView style={styles.conversationContainer} ref={conversationContainerRef}>
                 {conversation.map((message, index) => (
-                    <div key={index} className="message">
-                        {message.user && <p><strong>User:</strong> {message.user}</p>}
-                        <p><strong>AI:</strong> {message.ai}</p>
-                    </div>
+                    <View key={index} style={styles.messageContainer}>
+                        {message.user && <Text style={styles.userMessage}>User: {message.user}</Text>}
+                        <Text style={styles.aiMessage}>AI: {message.ai}</Text>
+                    </View>
                 ))}
-                {/* Display the last user query while waiting for a response */}
                 {userInput && (
-                    <div className="message">
-                        <p><strong>User:</strong> {userInput}</p>
-                    </div>
+                    <View style={styles.messageContainer}>
+                        <Text style={styles.userMessage}>User: {userInput}</Text>
+                    </View>
                 )}
-            </div>
-            <form onSubmit={handleSubmit}>
-                <input type="text" value={userInput} onChange={handleChange} disabled={isSending} /> {/* Disable input field when sending request */}
-                <button type="submit" disabled={isSending}>Send</button> {/* Disable button when sending request */}
-            </form>
+            </ScrollView>
+            <TextInput
+                style={styles.input}
+                value={userInput}
+                onChangeText={handleChange}
+                editable={!isSending}
+            />
+            <Button
+                title="Send"
+                onPress={handleSubmit}
+                disabled={isSending}
+            />
             {response && (
-                <div>
-                    {/* <p>Assistant Response: {response}</p>
-                    {resultDestPath && <p>Result Destination Path: {resultDestPath}</p>} */}
-                </div>
+                <>
+                    {/* <Text>Assistant Response: {response}</Text>
+                    {resultDestPath && <Text>Result Destination Path: {resultDestPath}</Text>} */}
+                </>
             )}
-        </div>
+        </View>
     );
 }
 
-export default ChatComponent;
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: 'black', // Set background color to black
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        color: 'white', // Set text color to white
+    },
+    conversationContainer: {
+        maxHeight: 300,
+        marginBottom: 10,
+        backgroundColor: '#f0f0f0', // This background color is not visible anymore
+        borderRadius: 10,
+        padding: 10,
+    },
+    messageContainer: {
+        marginBottom: 10,
+    },
+    userMessage: {
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    aiMessage: {},
+    input: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        marginBottom: 10,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        backgroundColor: 'white', // Set input background color to white
+    },
+});
 
+export default ChatComponent;

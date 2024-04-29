@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, FlatList, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Button, FlatList, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import NotificationModal from './NotificationModal'; // Import the NotificationModal component
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
+// const BASE_URL = 'https://y4u5dmmbw7.eu-west-1.awsapprunner.com'; // Base URL
+const BASE_URL = 'http://localhost:8000/';
 const StoreScreen = () => {
   const [folders, setFolders] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -10,13 +13,21 @@ const StoreScreen = () => {
   const [notificationMessage, setNotificationMessage] = useState('');
 
   useEffect(() => {
-    // Retrieve email from sessionStorage
-    const storedEmail = sessionStorage.getItem('email');
-    if (storedEmail) {
-      setEmail(storedEmail);
-    }
-    
-    fetch('http://localhost:8000/store-react-native', {
+    // Retrieve email from AsyncStorage
+    const getEmail = async () => {
+      try {
+        const storedEmail = await AsyncStorage.getItem('email');
+        if (storedEmail) {
+          setEmail(storedEmail);
+        }
+      } catch (error) {
+        console.error('Error retrieving email from AsyncStorage:', error);
+      }
+    };
+
+    getEmail();
+
+    fetch(`${BASE_URL}/store-react-native`, {
       credentials: 'include' // Include credentials (e.g., session token) in the request
     })
       .then(response => response.json())
@@ -44,7 +55,7 @@ const StoreScreen = () => {
       email: email,
     };
   
-    fetch('http://localhost:8000/enable_task_react', {
+    fetch(`${BASE_URL}/enable_task_react`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -59,7 +70,7 @@ const StoreScreen = () => {
           setNotificationMessage('Task enabled successfully');
           setNotificationVisible(true);
           // Fetch updated data after enabling the task
-          fetch('http://localhost:8000/store-react-native', {
+          fetch(`${BASE_URL}/store-react-native`, {
             credentials: 'include'
           })
             .then(response => response.json())
@@ -136,11 +147,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: 'black',
   },
   heading: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: 'white',
   },
   searchInput: {
     width: '100%',
@@ -150,6 +163,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
+    color: 'white',
+    backgroundColor: '#333',
   },
   taskContainer: {
     backgroundColor: '#f0f0f0',
@@ -160,14 +175,17 @@ const styles = StyleSheet.create({
   taskName: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: 'black',
   },
   taskDescription: {
     fontSize: 14,
     marginTop: 5,
+    color: 'black',
   },
   taskUUID: {
     fontSize: 14,
     color: '#888',
+    marginBottom: 5,
   },
   enableButton: {
     backgroundColor: '#007bff',

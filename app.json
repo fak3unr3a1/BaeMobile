@@ -15,14 +15,17 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSContactsUsageDescription": "This app needs access to your contacts to provide functionality related to contacts."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["READ_CONTACTS"] 
+      "permissions": ["READ_CONTACTS", "CALL_PHONE"]
     },
     "web": {
       "favicon": "./assets/favicon.png"

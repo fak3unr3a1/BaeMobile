@@ -8,7 +8,10 @@ import IndexScreen from './screens/IndexScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import StoreScreen from './screens/StoreScreen';
 import TasksScreen from './screens/TasksScreen';
-import ContactsList from './screens/ContactsList'; // Import ContactsList screen
+import ContactsList from './screens/ContactsList';
+import PhoneCall from './screens/PhoneCall';
+import TextEditorScreen from './screens/TextEditorScreen';
+import StoredDataScreen from './screens/StoredDataScreen'; // Import StoredDataScreen
 
 const Stack = createStackNavigator();
 
@@ -24,6 +27,9 @@ export default function App() {
         <Stack.Screen name="ConversationHistory" component={ConversationHistoryScreen} />
         <Stack.Screen name="Tasks" component={TasksScreen} />
         <Stack.Screen name="Contacts" component={ContactsList} />
+        <Stack.Screen name="PhoneCall" component={PhoneCall} />
+        <Stack.Screen name="TextEditor" component={TextEditorScreen} />
+        <Stack.Screen name="StoredData" component={StoredDataScreen} /> 
       </Stack.Navigator>
     </NavigationContainer>
   );
