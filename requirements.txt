@@ -1,0 +1,11 @@
+flask
+g4f==0.3
+spacy
+pymongo
+spacy
+urllib3==1.26.7
+flask-cors
+pygame
+
+
+#python -m spacy download en_core_web_sm && pip install -r requirements.txt

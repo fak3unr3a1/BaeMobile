@@ -11,7 +11,10 @@ import TasksScreen from './screens/TasksScreen';
 import ContactsList from './screens/ContactsList';
 import PhoneCall from './screens/PhoneCall';
 import TextEditorScreen from './screens/TextEditorScreen';
-import StoredDataScreen from './screens/StoredDataScreen'; // Import StoredDataScreen
+import StoredDataScreen from './screens/StoredDataScreen'; 
+import CalendarScreen from './screens/CalenderScreen';
+import 'setimmediate';
+
 
 const Stack = createStackNavigator();
 
@@ -30,6 +33,7 @@ export default function App() {
         <Stack.Screen name="PhoneCall" component={PhoneCall} />
         <Stack.Screen name="TextEditor" component={TextEditorScreen} />
         <Stack.Screen name="StoredData" component={StoredDataScreen} /> 
+        <Stack.Screen name="Calendar" component={CalendarScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

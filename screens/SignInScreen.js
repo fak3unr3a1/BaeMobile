@@ -16,6 +16,8 @@ const SignInScreen = ({ navigation }) => {
         email,
         password,
       });
+      console.log('Email:', email);
+      console.log('Password:', password);
 
       // Store the user's email in AsyncStorage upon successful sign-in
       await AsyncStorage.setItem('email', email);

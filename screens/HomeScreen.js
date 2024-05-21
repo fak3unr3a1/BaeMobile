@@ -4,8 +4,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-// Import the TextEditorScreen component
-import TextEditorScreen from './TextEditorScreen';
+
 
 // Define the HomeScreen component
 const HomeScreen = ({ navigation }) => {
@@ -42,6 +41,10 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('StoredData');
   };
 
+  const navigateToCalendar = () => {
+    navigation.navigate('Calendar');
+  };
+
   // Render the component
   return (
     <View style={styles.container}>
@@ -62,15 +65,19 @@ const HomeScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.button} onPress={navigateToStore}>
           <Text style={styles.buttonText}>Go to Ability Store</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={navigateToCalendar}>
+          <Text style={styles.buttonText}>Go to Calendar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={navigateToStoredData}>
+          <Text style={styles.buttonText}>View Stored Data</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={navigateToContacts}>
           <Text style={styles.buttonText}>Show Contacts</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={navigateToTextEditor}>
           <Text style={styles.buttonText}>Open Text Editor</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={navigateToStoredData}>
-          <Text style={styles.buttonText}>View Stored Data</Text>
-        </TouchableOpacity>
+
         <TouchableOpacity style={styles.button} onPress={navigateToPhoneCall}>
           <Text style={styles.buttonText}>Make Phone Call</Text>
         </TouchableOpacity>
